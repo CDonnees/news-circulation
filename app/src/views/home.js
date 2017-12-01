@@ -17,16 +17,67 @@ angular.module('app.home', ['ngRoute'])
 ) {
 
 	$scope.data
-	$scope.files = [
-		'11Mohamed SaouANDmacronmohamedfaux.json',
-		'22testtoto.json'
-	]
+	
+	d3.json("data/offshore.json", function(json){
+		var data = {}
+		data.retweets = []
+		data.originalsIndex = {}
+		json.hits.hits.map(function(d){return d._source})
+			.forEach(function(d){
+				var rt
+				try { rt = d.retweeted_status.id_str }
+				catch(e){}
+				if (rt) {
+					data.retweets.push(d)
+				} else {
+					data.originalsIndex[d.id_str] = d
+				}
+			})
+		d3.csv("data/offshore.csv", function(csv){
+			csv.forEach(function(d){
+				d.status = d['Circulated as claim or as debunk or undecided']
 
-	// initData(buildDummyData())
+				// HOTFIXES
+				if (d.tweet_id == "8.55094E+17") {
+					d.tweet_id = "855094219882496000"
+				}
+				if (d.tweet_id == "8.60165E+17") {
+					d.tweet_id = "860164730564096000"
+				}
+				if (d.tweet_id == "8.601E+17") {
+					d.tweet_id = "860100448749056000"
+				}
+				if (d.tweet_id == "8.59892E+17") {
+					d.tweet_id = "859892194957824000"
+				}
+				if (d.tweet_id == "8.60225E+17") {
+					d.tweet_id = "860224838287360000"
+				}
 
-	d3.json("data/"+$scope.files[0], function(json){
-		$timeout(function(){
-			initData(json)
+				var original = data.originalsIndex[d.tweet_id]
+				if (original) {
+					original.csv = d
+				} else {
+					console.log('TWEET NOT FOUND (1):', d.tweet_id)
+				}
+
+			})
+			// Build datapoints
+			data.datapoints = []
+			data.retweets.forEach(function(d){
+				var original = data.originalsIndex[d.retweeted_status.id_str]
+				if (original) {
+					d.csv = d
+					data.datapoints.push(d)
+					// console.log('FOUND')
+				} else {
+					// console.log('TWEET NOT FOUND (2):', d.retweeted_status.id_str)
+				}
+			})
+			$timeout(function(){
+				// $scope.data = data
+				// console.log($scope.data)
+			})
 		})
 	})
 
