@@ -22,17 +22,22 @@ angular.module('app.home', ['ngRoute'])
 		var data = {}
 		data.retweets = []
 		data.originalsIndex = {}
+		var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.000Z");
 		json.hits.hits.map(function(d){return d._source})
 			.forEach(function(d){
+				// Consolidate time
+				d.timestamp = +parseTime(d.ca)
 				var rt
 				try { rt = d.retweeted_status.id_str }
 				catch(e){}
 				if (rt) {
 					data.retweets.push(d)
 				} else {
+					d.retweets = 0
 					data.originalsIndex[d.id_str] = d
 				}
 			})
+		data.retweets.sort(function(a, b){return a.timestamp - b.timestamp})
 		d3.csv("data/offshore.csv", function(csv){
 			csv.forEach(function(d){
 				d.status = d['Circulated as claim or as debunk or undecided'].toLowerCase()
@@ -68,6 +73,7 @@ angular.module('app.home', ['ngRoute'])
 				var original = data.originalsIndex[d.retweeted_status.id_str]
 				if (original) {
 					d.csv = original.csv
+					d.visibility_score = original.retweets++
 					data.datapoints.push(d)
 				} else {
 					// console.log('TWEET NOT FOUND (2):', d.retweeted_status.id_str)
@@ -119,8 +125,6 @@ angular.module('app.home', ['ngRoute'])
 			})
 			.map(function(d){
 				d.as_true = d.csv.status == "claim"
-				d.visibility_score = 1//+d.csv.retweet_count
-				d.timestamp = +parseTime(d.ca)
 				return d
 			})
 		console.log('Datapoints', data.datapoints)
@@ -167,8 +171,8 @@ angular.module('app.home', ['ngRoute'])
 				lane = "asFalse"
 			}
 			var currentTimestamp = d.timestamp
-			var currentVisibility = d.visibility_score
-			while(currentTimestamp < data.stats.timeExtent[1] && currentVisibility > 0.5) {
+			var currentVisibility = 1//d.visibility_score
+			while(currentTimestamp < data.stats.timeExtent[1] && currentVisibility > 0.1) {
 				timeIndex[timeScale(currentTimestamp)][lane] += currentVisibility
 				currentTimestamp += data.settings.timeResolutionLength
 				currentVisibility *= data.settings.inertia
