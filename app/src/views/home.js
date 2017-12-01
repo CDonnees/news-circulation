@@ -67,16 +67,14 @@ angular.module('app.home', ['ngRoute'])
 			data.retweets.forEach(function(d){
 				var original = data.originalsIndex[d.retweeted_status.id_str]
 				if (original) {
-					d.csv = d
+					d.csv = original.csv
 					data.datapoints.push(d)
-					// console.log('FOUND')
 				} else {
 					// console.log('TWEET NOT FOUND (2):', d.retweeted_status.id_str)
 				}
 			})
 			$timeout(function(){
-				// $scope.data = data
-				// console.log($scope.data)
+				initData(data)
 			})
 		})
 	})
@@ -112,21 +110,20 @@ angular.module('app.home', ['ngRoute'])
 	}
 
 	function initData(data) {
+		console.log('data', data)
 		// Clean and consolidate
-		var parseTime = d3.timeParse("%d/%m/%Y %H:%M:%S");
-		data.datapoints.forEach(function(d){
-			if (d.as_true === "true" || d.as_true === "vrai") {
-				d.as_true = true
-			}
-			if (d.as_true === "false" || d.as_true === "faux") {
-				d.as_true = false
-			}
-			d.visibility_score = 10 + 0.9 * (+d.visibility_score)
-			d.timestamp = +parseTime(d.date)
-		})
-		data.agents.forEach(function(agent){
-			agent.visibility_score = 1+agent.visibility_score
-		})
+		var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.000Z");
+		data.datapoints = data.datapoints
+			.filter(function(d){
+				return d.csv.status == "claim" || d.csv.status == "debunk"
+			})
+			.map(function(d){
+				d.as_true = d.csv.status == "claim"
+				d.visibility_score = +d.csv.retweet_count
+				d.timestamp = +parseTime(d.ca)
+				return d
+			})
+		console.log('Datapoints', data.datapoints)
 
 		// Settings
 		data.settings = {}
@@ -139,13 +136,6 @@ angular.module('app.home', ['ngRoute'])
 		// Stats
 		data.stats = {}
 		data.stats.timeExtent = d3.extent(data.datapoints, function(d){ return d.timestamp })
-		data.stats.agentVisibilityExtent = d3.extent(data.agents, function(d){ return d.visibility_score })
-
-		/*// Agent index
-		data.agentIndex = {}
-		data.agents.forEach(function(agent){
-			data.agentIndex[agent.id] = agent
-		})*/
 
 		// Crunch the data to produce the curves
 		data.asTrue = []
