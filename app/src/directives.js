@@ -31,7 +31,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 8, right: 32, bottom: 8, left: 32};
+              var margin = {top: 128, right: 32, bottom: 8, left: 32};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = el[0].offsetHeight - 12 - margin.top - margin.bottom;
 
@@ -47,11 +47,11 @@ angular.module('app.directives', [])
 
               var xAsTrue = d3.scaleLinear()
 							    .rangeRound([0, width/2])
-							    .domain(d3.extent($scope.data.asTrue, function(d){return d.volume}))
+							    .domain([0, d3.max($scope.data.asTrue, function(d){return d.volume})])
 
               var xAsFalse = d3.scaleLinear()
 							    .rangeRound([width, width/2])
-							    .domain(d3.extent($scope.data.asFalse, function(d){return d.volume}))
+							    .domain([0, d3.max($scope.data.asFalse, function(d){return d.volume})])
 
 							var y = d3.scaleTime()
 							    .rangeRound([0, height])
