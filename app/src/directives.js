@@ -33,7 +33,7 @@ angular.module('app.directives', [])
               // Setup: dimensions
               var margin = {top: 128, right: 32, bottom: 8, left: 32};
               var width = el[0].offsetWidth - margin.left - margin.right;
-              var height = el[0].offsetHeight - 12 - margin.top - margin.bottom;
+              var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.extent[1] - $scope.data.stats.extent[0])
 
               // While loading redraw may trigger before element being properly sized
               if (width <= 0 || height <= 0) {

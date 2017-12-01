@@ -46,6 +46,7 @@ angular.module('app.home', ['ngRoute'])
 	data.settings = {}
 	data.settings.timeResolution = 10
 	data.settings.inertia = 0.8
+	data.settings.timeSpaceRatio = 1
 
 	// Stats
 	data.stats = {}
