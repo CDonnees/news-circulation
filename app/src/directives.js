@@ -26,6 +26,7 @@ angular.module('app.directives', [])
         // Data: timestamp in undecided out discovered in_uncrawled in_untagged total
         function redraw() {
           if ($scope.data !== undefined){
+
             $timeout(function(){
               el.html('');
 
@@ -40,6 +41,8 @@ angular.module('app.directives', [])
                 $timeout(redraw, 250)
                 return
               }
+
+
 
              	var parseTime = d3.timeParse("%Q") // Or %s
 
@@ -146,14 +149,14 @@ angular.module('app.directives', [])
               var g = svg.append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-              g.selectAll(".dot")
+              /*g.selectAll(".dot")
 					      .data($scope.data.datapoints)
 					    .enter().append("circle")
 					      .attr("class", "dot")
 					      .attr("r", function(d){ return $scope.data.settings.visibilitySpaceRatio * Math.sqrt($scope.data.agentIndex[d.agent_id].visibility_score) })
 					      .attr("cx", function(d) { return x($scope.data.agentIndex[d.agent_id].visibility_score) })
 					      .attr("cy", function(d) { return y(d.timestamp) })
-					      .style("fill", 'black')
+					      .style("fill", 'black')*/
 
             })
           }

@@ -25,8 +25,9 @@ angular.module('app.home', ['ngRoute'])
 	// initData(buildDummyData())
 
 	d3.json("data/"+$scope.files[0], function(json){
-		console.log(json)
-		initData(json)
+		$timeout(function(){
+			initData(json)
+		})
 	})
 
 	function buildDummyData() {
@@ -63,38 +64,37 @@ angular.module('app.home', ['ngRoute'])
 		// Clean and consolidate
 		var parseTime = d3.timeParse("%d/%m/%Y %H:%M:%S");
 		data.datapoints.forEach(function(d){
-			if (d.as_true === "true") {
+			if (d.as_true === "true" || d.as_true === "vrai") {
 				d.as_true = true
 			}
-			if (d.as_true === "false") {
+			if (d.as_true === "false" || d.as_true === "faux") {
 				d.as_true = false
 			}
 			d.visibility_score = +d.visibility_score
 			d.timestamp = +parseTime(d.date)
 		})
 		data.agents.forEach(function(agent){
-			agent.visibility_score = +agent.visibility_score
+			agent.visibility_score = 1+agent.visibility_score
 		})
-		return
 
 		// Settings
 		data.settings = {}
 		data.settings.visibilityResolution = 5
 		data.settings.visibilitySpaceRatio = 1
-		data.settings.timeResolutionLength = 10
-		data.settings.inertia = 0.8
-		data.settings.timeSpaceRatio = 1
+		data.settings.timeResolutionLength = 10000000
+		data.settings.inertia = 0.9
+		data.settings.timeSpaceRatio = 0.00000005
 
 		// Stats
 		data.stats = {}
 		data.stats.timeExtent = d3.extent(data.datapoints, function(d){ return d.timestamp })
 		data.stats.agentVisibilityExtent = d3.extent(data.agents, function(d){ return d.visibility_score })
 
-		// Agent index
+		/*// Agent index
 		data.agentIndex = {}
 		data.agents.forEach(function(agent){
 			data.agentIndex[agent.id] = agent
-		})
+		})*/
 
 		// Crunch the data to produce the curves
 		data.asTrue = []
@@ -112,14 +112,14 @@ angular.module('app.home', ['ngRoute'])
 		
 		data.datapoints.forEach(function(d){
 			var lane
-			if (d.as_true === true) {
+			if (d.as_true) {
 				lane = "asTrue"
-			} else if (d.as_true === false) {
+			} else {
 				lane = "asFalse"
 			}
 			var currentTimestamp = d.timestamp
 			var currentVisibility = d.visibility_score
-			while(currentTimestamp < data.stats.timeExtent[1] && currentVisibility > 1) {
+			while(currentTimestamp < data.stats.timeExtent[1] && currentVisibility > 0.5) {
 				timeIndex[timeScale(currentTimestamp)][lane] += currentVisibility
 				currentTimestamp += data.settings.timeResolutionLength
 				currentVisibility *= data.settings.inertia
@@ -141,7 +141,7 @@ angular.module('app.home', ['ngRoute'])
 			.range(visibilityRange)*/
 
 		$scope.data = data
-
+		console.log('END INIT: $scope.data', $scope.data)
 	}
 
 
