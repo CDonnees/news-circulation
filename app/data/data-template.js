@@ -9,10 +9,7 @@
 			"media_type": "video",
 			
 			"platform": "Facebook",
-			
-			// Baskets gather similar items with different IDs
-			"entity_basket_id": "XXXXXX",
-			
+						
 			// Timestamp
 			"date":"XXXXXX",
 
