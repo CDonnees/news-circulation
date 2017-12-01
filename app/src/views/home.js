@@ -70,7 +70,7 @@ angular.module('app.home', ['ngRoute'])
 			if (d.as_true === "false" || d.as_true === "faux") {
 				d.as_true = false
 			}
-			d.visibility_score = +d.visibility_score
+			d.visibility_score = 10 + 0.9 * (+d.visibility_score)
 			d.timestamp = +parseTime(d.date)
 		})
 		data.agents.forEach(function(agent){
