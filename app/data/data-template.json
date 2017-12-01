@@ -2,17 +2,33 @@
 	"datapoints":[
 		{
 			"entity_id":"XXXXXX",
-			"entity_type":"Video shared on Facebook",		// Media type x Platform
+
+			// Media type x Platform
+			"entity_type":"Video shared on Facebook",
+			
 			"media_type": "video",
+			
 			"platform": "Facebook",
-			"entity_basket_id": "XXXXXX",								// Baskets gather similar items with different IDs
-			"date":"XXXXXX",														// Timestamp?
+			
+			// Baskets gather similar items with different IDs
+			"entity_basket_id": "XXXXXX",
+			
+			// Timestamp
+			"date":"XXXXXX",
+
 			"case":"Macron Offshore",
-			"agent_id": "XXXXXX",												// Who circulates this entity
-			"agent_visibility_score": 123,							// Optional: it may just be in the "agents" section
-			"as_true": true 														// Fake news or debunk
+			
+			// Who circulates this entity
+			"agent_id": "XXXXXX",
+
+			// Optional: it may just be in the "agents" section
+			"agent_visibility_score": 123,
+
+			// Fake news or debunk
+			"as_true": true
 		}
 	],
+	
 	"agents":[
 		{
 			"id": "XXXXXX",
