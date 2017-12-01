@@ -33,7 +33,7 @@ angular.module('app.directives', [])
               // Setup: dimensions
               var margin = {top: 128, right: 32, bottom: 8, left: 32};
               var width = el[0].offsetWidth - margin.left - margin.right;
-              var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.extent[1] - $scope.data.stats.extent[0])
+              var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
 
               // While loading redraw may trigger before element being properly sized
               if (width <= 0 || height <= 0) {
@@ -41,9 +41,7 @@ angular.module('app.directives', [])
                 return
               }
 
-              console.log($scope.data)
-
-              var parseTime = d3.timeParse("%Q") // Or %s
+             	var parseTime = d3.timeParse("%Q") // Or %s
 
               var xAsTrue = d3.scaleLinear()
 							    .rangeRound([0, width/2])
@@ -77,13 +75,85 @@ angular.module('app.directives', [])
 
               g.append("path")
 					      .datum($scope.data.asTrue)
-					      .attr("fill", "steelblue")
+					      .attr("fill", "black")
 					      .attr("d", areaAsTrue);
 
 					    g.append("path")
 					      .datum($scope.data.asFalse)
-					      .attr("fill", "steelblue")
+					      .attr("fill", "black")
 					      .attr("d", areaAsFalse);
+
+            })
+          }
+        }
+
+      }
+    }
+  })
+
+	.directive('visibilitySpace', function(
+    $timeout
+  ){
+    return {
+      restrict: 'A',
+      scope: {
+        data: '='
+      },
+      link: function($scope, el, attrs) {
+
+        el.html('<div>LOADING</div>')
+
+        $scope.$watch('data', redraw)
+
+        window.addEventListener('resize', redraw)
+        $scope.$on('$destroy', function(){
+          window.removeEventListener('resize', redraw)
+        })
+
+        // Data: timestamp in undecided out discovered in_uncrawled in_untagged total
+        function redraw() {
+          if ($scope.data !== undefined){
+            $timeout(function(){
+              el.html('');
+
+              window.el = el[0]
+              // Setup: dimensions
+              var margin = {top: 128, right: 32, bottom: 8, left: 32};
+              var width = el[0].offsetWidth - margin.left - margin.right;
+              var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
+
+              // While loading redraw may trigger before element being properly sized
+              if (width <= 0 || height <= 0) {
+                $timeout(redraw, 250)
+                return
+              }
+
+              var parseTime = d3.timeParse("%Q") // Or %s
+
+              var x = d3.scaleLinear()
+							    .rangeRound([0, width])
+							    .domain([0, $scope.data.stats.agentVisibilityExtent[1]])
+
+              var y = d3.scaleTime()
+							    .rangeRound([0, height])
+							    .domain(d3.extent($scope.data.asTrue, function(d){return d.timestamp}))
+
+              // Setup: SVG container
+              var svg = d3.select(el[0]).append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+
+              var g = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+              g.selectAll(".dot")
+					      .data($scope.data.datapoints)
+					    .enter().append("circle")
+					      .attr("class", "dot")
+					      .attr("r", function(d){ return $scope.data.settings.visibilitySpaceRatio * Math.sqrt($scope.data.agentIndex[d.agent_id].visibility_score) })
+					      .attr("cx", function(d) { return x($scope.data.agentIndex[d.agent_id].visibility_score) })
+					      .attr("cy", function(d) { return y(d.timestamp) })
+					      .style("fill", 'black')
 
             })
           }
