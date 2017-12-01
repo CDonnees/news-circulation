@@ -32,7 +32,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 128, right: 32, bottom: 8, left: 32};
+              var margin = {top: 128, right: 0, bottom: 8, left: 0};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
 
@@ -45,14 +45,16 @@ angular.module('app.directives', [])
 
 
              	var parseTime = d3.timeParse("%Q") // Or %s
-
+             	var unifiedMax = Math.max(d3.max($scope.data.asTrue, function(d){return d.volume}), d3.max($scope.data.asFalse, function(d){return d.volume}))
               var xAsTrue = d3.scaleLinear()
 							    .rangeRound([0, width/2])
-							    .domain([0, d3.max($scope.data.asTrue, function(d){return d.volume})])
+							    .domain([0, unifiedMax])
+							    // .domain([0, d3.max($scope.data.asTrue, function(d){return d.volume})])
 
               var xAsFalse = d3.scaleLinear()
 							    .rangeRound([width, width/2])
-							    .domain([0, d3.max($scope.data.asFalse, function(d){return d.volume})])
+							    .domain([0, unifiedMax])
+							    // .domain([0, d3.max($scope.data.asFalse, function(d){return d.volume})])
 
 							var y = d3.scaleTime()
 							    .rangeRound([0, height])
@@ -78,12 +80,12 @@ angular.module('app.directives', [])
 
               g.append("path")
 					      .datum($scope.data.asTrue)
-					      .attr("fill", "black")
+					      .attr("fill", $scope.data.settings.colors.asTrueOpaque)
 					      .attr("d", areaAsTrue);
 
 					    g.append("path")
 					      .datum($scope.data.asFalse)
-					      .attr("fill", "black")
+					      .attr("fill", $scope.data.settings.colors.asFalseOpaque)
 					      .attr("d", areaAsFalse);
 
             })
@@ -121,7 +123,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 128, right: 32, bottom: 8, left: 32};
+              var margin = {top: 128, right: 64, bottom: 8, left: 4};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
 
@@ -135,7 +137,7 @@ angular.module('app.directives', [])
 
               var x = d3.scaleLinear()
 							    .rangeRound([0, width])
-							    .domain([0, $scope.data.stats.agentVisibilityExtent[1]])
+							    .domain([0, $scope.data.stats.visibilityExtent[1]])
 
               var y = d3.scaleTime()
 							    .rangeRound([0, height])
@@ -149,15 +151,24 @@ angular.module('app.directives', [])
               var g = svg.append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-              /*g.selectAll(".dot")
+              g.selectAll(".dot")
 					      .data($scope.data.datapoints)
 					    .enter().append("circle")
 					      .attr("class", "dot")
-					      .attr("r", function(d){ return $scope.data.settings.visibilitySpaceRatio * Math.sqrt($scope.data.agentIndex[d.agent_id].visibility_score) })
-					      .attr("cx", function(d) { return x($scope.data.agentIndex[d.agent_id].visibility_score) })
+					      // .attr("r", 2)
+					      .attr("r", function(d){ return $scope.data.settings.visibilitySpaceRatio * Math.sqrt(d.visibility_score) })
+					      .attr("cx", function(d) { return x(d.visibility_score) })
 					      .attr("cy", function(d) { return y(d.timestamp) })
-					      .style("fill", 'black')*/
-
+					      .style("fill", function(d){
+					      	if (d.as_true) {
+					      		return $scope.data.settings.colors.asTrue
+					      	} else {
+					      		return $scope.data.settings.colors.asFalse
+					      	}
+					      })
+					      .on("mouseover", function(d) {
+					      	console.log(d.visibility_score)
+				        })
             })
           }
         }

@@ -35,7 +35,7 @@ angular.module('app.home', ['ngRoute'])
 			})
 		d3.csv("data/offshore.csv", function(csv){
 			csv.forEach(function(d){
-				d.status = d['Circulated as claim or as debunk or undecided']
+				d.status = d['Circulated as claim or as debunk or undecided'].toLowerCase()
 
 				// HOTFIXES
 				if (d.tweet_id == "8.55094E+17") {
@@ -119,7 +119,7 @@ angular.module('app.home', ['ngRoute'])
 			})
 			.map(function(d){
 				d.as_true = d.csv.status == "claim"
-				d.visibility_score = +d.csv.retweet_count
+				d.visibility_score = 1//+d.csv.retweet_count
 				d.timestamp = +parseTime(d.ca)
 				return d
 			})
@@ -127,15 +127,23 @@ angular.module('app.home', ['ngRoute'])
 
 		// Settings
 		data.settings = {}
-		data.settings.visibilityResolution = 5
-		data.settings.visibilitySpaceRatio = 1
-		data.settings.timeResolutionLength = 10000000
-		data.settings.inertia = 0.9
-		data.settings.timeSpaceRatio = 0.00000005
+		data.settings.visibilityResolution = 20
+		data.settings.visibilitySpaceRatio = 0.6
+		data.settings.timeResolutionLength = 1000000
+		data.settings.inertia = 0.8
+		data.settings.timeSpaceRatio = 0.000003
+		data.settings.colors = {
+			asTrueOpaque: "#f5cc00",
+			asFalseOpaque: "#4db8c0",
+			asTrue: "rgba(245, 204, 0, 0.2)",
+			asFalse: "rgba(77, 184, 192, 0.2)"
+
+		}
 
 		// Stats
 		data.stats = {}
 		data.stats.timeExtent = d3.extent(data.datapoints, function(d){ return d.timestamp })
+		data.stats.visibilityExtent = d3.extent(data.datapoints, function(d){ return d.visibility_score })
 
 		// Crunch the data to produce the curves
 		data.asTrue = []
@@ -173,13 +181,14 @@ angular.module('app.home', ['ngRoute'])
 		}
 
 		// Crunch the visibility space(s)
-		/*var visibilityRange = []
-		for (i=0; i<=data.stats.agentVisibilityExtent[1]; i += data.stats.agentVisibilityExtent[1]/data.settings.visibilityResolution){
+		var visibilityRange = []
+		var i
+		for (i=0; i<=data.stats.visibilityExtent[1]; i += data.stats.visibilityExtent[1]/data.settings.visibilityResolution){
 			visibilityRange.push(i)
 		}
 		var visibilityScale = d3.scaleQuantize()
-			.domain([0, data.stats.agentVisibilityExtent[1]])
-			.range(visibilityRange)*/
+			.domain([0, data.stats.visibilityExtent[1]])
+			.range(visibilityRange)
 
 		$scope.data = data
 		console.log('END INIT: $scope.data', $scope.data)
