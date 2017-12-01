@@ -45,7 +45,7 @@ angular.module('app.home', ['ngRoute'])
 	// Settings
 	data.settings = {}
 	data.settings.timeResolution = 10
-	data.settings.decay = 0.8
+	data.settings.inertia = 0.8
 
 	// Stats
 	data.stats = {}
@@ -66,10 +66,18 @@ angular.module('app.home', ['ngRoute'])
 		.range(timeRange)
 	
 	data.datapoints.forEach(function(d){
+		var lane
 		if (d.as_true === true) {
-			timeIndex[timeScale(d.timestamp)].asTrue += d.visibility_score
+			lane = "asTrue"
 		} else if (d.as_true === false) {
-			timeIndex[timeScale(d.timestamp)].asFalse += d.visibility_score
+			lane = "asFalse"
+		}
+		var currentTimestamp = d.timestamp
+		var currentVisibility = d.visibility_score
+		while(currentTimestamp < data.stats.extent[1] && currentVisibility > 1) {
+			timeIndex[timeScale(currentTimestamp)][lane] += currentVisibility
+			currentTimestamp += data.settings.timeResolution
+			currentVisibility *= data.settings.inertia
 		}
 	})
 

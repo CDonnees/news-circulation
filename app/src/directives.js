@@ -31,7 +31,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 8, right: 0, bottom: 8, left: 8};
+              var margin = {top: 8, right: 32, bottom: 8, left: 32};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = el[0].offsetHeight - 12 - margin.top - margin.bottom;
 
