@@ -88,6 +88,13 @@ angular.module('app.directives', [])
 					      .attr("fill", $scope.data.settings.colors.asFalseOpaque)
 					      .attr("d", areaAsFalse);
 
+					    g.append("g")
+					      .attr("transform", "translate(" + (width/2) + ",0)")
+					      .call(
+					      	d3.axisLeft(y)
+					      		.ticks($scope.data.settings.timeTicks)
+					      )
+
             })
           }
         }
@@ -123,7 +130,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 128, right: 64, bottom: 8, left: 4};
+              var margin = {top: 128, right: 64, bottom: 8, left: 0};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
 
@@ -169,6 +176,12 @@ angular.module('app.directives', [])
 					      .on("mouseover", function(d) {
 					      	console.log(d.visibility_score)
 				        })
+
+				       g.append("g")
+					      .call(
+					      	d3.axisRight(y)
+					      		.ticks($scope.data.settings.timeTicks)
+					      )
             })
           }
         }

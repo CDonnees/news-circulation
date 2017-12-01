@@ -134,8 +134,9 @@ angular.module('app.home', ['ngRoute'])
 		data.settings.visibilityResolution = 20
 		data.settings.visibilitySpaceRatio = 0.6
 		data.settings.timeResolutionLength = 1000000
+		data.settings.timeTicks = 300
 		data.settings.inertia = 0.8
-		data.settings.timeSpaceRatio = 0.000003
+		data.settings.timeSpaceRatio = 0.000002
 		data.settings.colors = {
 			asTrueOpaque: "#f5cc00",
 			asFalseOpaque: "#4db8c0",
