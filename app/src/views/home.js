@@ -138,11 +138,14 @@ angular.module('app.home', ['ngRoute'])
 		data.settings.inertia = 0.8
 		data.settings.timeSpaceRatio = 0.000002
 		data.settings.colors = {
-			asTrueOpaque: "#f5cc00",
-			asFalseOpaque: "#4db8c0",
-			asTrue: "rgba(245, 204, 0, 0.2)",
-			asFalse: "rgba(77, 184, 192, 0.2)"
-
+			asTrueOpaque: "#000000",
+			asFalseOpaque: "#FFFFFF",
+			asTrue: "rgba(0, 0, 0, 0.1)",
+			asFalse: "rgba(255, 255, 255, 0.1)"
+			// asTrueOpaque: "#f5cc00",
+			// asFalseOpaque: "#4db8c0",
+			// asTrue: "rgba(245, 204, 0, 0.1)",
+			// asFalse: "rgba(77, 184, 192, 0.1)"
 		}
 
 		// Stats

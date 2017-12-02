@@ -130,7 +130,7 @@ angular.module('app.directives', [])
 
               window.el = el[0]
               // Setup: dimensions
-              var margin = {top: 128, right: 64, bottom: 8, left: 0};
+              var margin = {top: 128, right: 64, bottom: 8, left: 64};
               var width = el[0].offsetWidth - margin.left - margin.right;
               var height = $scope.data.settings.timeSpaceRatio * ($scope.data.stats.timeExtent[1] - $scope.data.stats.timeExtent[0])
 
@@ -142,8 +142,11 @@ angular.module('app.directives', [])
 
               var parseTime = d3.timeParse("%Q") // Or %s
 
-              var x = d3.scaleLinear()
-							    .rangeRound([0, width])
+              var xAsTrue = d3.scaleLinear()
+							    .rangeRound([0, 0.8 * width])
+							    .domain([0, $scope.data.stats.visibilityExtent[1]])
+              var xAsFalse = d3.scaleLinear()
+							    .rangeRound([width, 0.2 * width])
 							    .domain([0, $scope.data.stats.visibilityExtent[1]])
 
               var y = d3.scaleTime()
@@ -164,7 +167,13 @@ angular.module('app.directives', [])
 					      .attr("class", "dot")
 					      .attr("r", 4)
 					      // .attr("r", function(d){ return $scope.data.settings.visibilitySpaceRatio * Math.sqrt(d.visibility_score) })
-					      .attr("cx", function(d) { return x(d.visibility_score) })
+					      .attr("cx", function(d) { 
+					      	if (d.as_true) {
+						      	return xAsTrue(d.visibility_score)
+					      	} else {
+						      	return xAsFalse(d.visibility_score)
+					      	}
+					      })
 					      .attr("cy", function(d) { return y(d.timestamp) })
 					      .style("fill", function(d){
 					      	if (d.as_true) {
@@ -178,6 +187,12 @@ angular.module('app.directives', [])
 				        })
 
 				       g.append("g")
+					      .call(
+					      	d3.axisLeft(y)
+					      		.ticks($scope.data.settings.timeTicks)
+					      )
+				       g.append("g")
+				       	.attr("transform", "translate(" + width + ",0)")
 					      .call(
 					      	d3.axisRight(y)
 					      		.ticks($scope.data.settings.timeTicks)
